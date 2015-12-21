@@ -1,0 +1,144 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <script src="~/Scripts/jquery-2.1.4.min.js"></script>
+    <style type="text/css">
+        table.t1 {
+            margin: 1em auto;
+            border-collapse: collapse;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .t1 th, .t1 td {
+            padding: 4px 8px;
+        }
+
+        .t1 thead th {
+            background: #4f81bd;
+            text-align: left;
+            font-size: 20px;
+            color: #fff;
+        }
+
+        .t1 tr {
+            border-right: 1px solid #95b3d7;
+        }
+
+        .t1 tbody tr {
+            border-bottom: 1px solid #95b3d7;
+        }
+
+            .t1 tbody tr:nth-child(odd) {
+                background: #dbe5f0;
+            }
+
+            .t1 tbody th, .t1 tbody tr:nth-child(even) td {
+                border-right: 1px solid #95b3d7;
+            }
+
+        .t1 tfoot th {
+            background: #4f81bd;
+            text-align: left;
+            font-weight: normal;
+            font-size: 15px;
+            color: #fff;
+        }
+
+            .t1 tfoot th a {
+                text-decoration: none;
+                color: white;
+            }
+
+        .t1 tr *:nth-child(3), .t1 tr *:nth-child(4) {
+            text-align: center;
+        }
+    </style>
+
+    <script>
+        $(document).ready(function () {
+            $.getJSON("/Home/GetData").done(function (data) {
+                jsonObject = JSON.parse(data);
+                var html = '<table class="t1">' + '<tfoot><tr><th colspan="3"><a href="http://www.borakasmer.com" target=blank>www.borakasmer.com</a></th></tr></tfoot>' +
+                    '<thead><tr><th onclick="SortTable(\'Year\',jsonObject)">Yıl</th><th onclick="SortTable(\'Name\',jsonObject)">Makale Adı</th><th onclick="SortTable(\'User\',jsonObject)">Tekil Kullanıcı</th></tr></thead>';
+                for (i = 0; i < jsonObject.length; i++) {
+                    html += '<tr><td>' + jsonObject[i].Yıl + '</td><td>' + jsonObject[i].data[0].Makale + '</td><td>' + jsonObject[i].data[0].UniqeUser + '</td></tr>';
+                }
+                html += '</table>';
+                $('#dataTable').append(html);
+
+                $(".t1 th").hover(function () {
+                    $(this).css('cursor', 'pointer');
+                }, function () {
+                    $(this).css('cursor', 'auto');
+                });
+
+            });
+        });
+
+        function SortTable(type, dataSort) {
+            dataSort.sort(SortByColomun(type));
+
+            var html = '<table class="t1">' + '<tfoot><tr><th colspan="3"><a href="http://www.borakasmer.com" target=blank>www.borakasmer.com</a></th></tr></tfoot>' +
+                   '<thead><tr><th onclick="SortTable(\'Year\',jsonObject)">Yıl</th><th onclick="SortTable(\'Name\',jsonObject)">Makale Adı</th><th onclick="SortTable(\'User\',jsonObject)">Tekil Okuyucu</th></tr></thead>';
+            for (i = 0; i < dataSort.length; i++) {
+                html += '<tr><td>' + dataSort[i].Yıl + '</td><td>' + dataSort[i].data[0].Makale + '</td><td>' + dataSort[i].data[0].UniqeUser + '</td></tr>';
+            }
+            html += '</table>';
+            $('#dataTable').html(html);
+
+            $(".t1 th").hover(function () {
+                $(this).css('cursor', 'pointer');
+            }, function () {
+                $(this).css('cursor', 'auto');
+            });
+        }
+
+        function SortByColomun(type) {
+            return function (a, b) {
+                switch (type) {
+                    case 'Year':
+                        {
+                            if (b.Yıl != null && b.Yıl != undefined && a.Yıl != null && a.Yıl != undefined) {
+                                var First = a.Yıl;
+                                var Second = b.Yıl;
+                                return ((First < Second) ? -1 : ((First > Second) ? 1 : 0));
+                            }
+                            break;
+                        }
+                    case 'Name':
+                        {
+                            if (b.data[0].Makale != null && b.data[0].Makale != undefined && a.data[0].Makale != null && a.data[0].Makale != undefined) {
+                                var First = a.data[0].Makale.toString().toUpperCase();
+                                var Second = b.data[0].Makale.toString().toUpperCase();
+                                return ((First < Second) ? -1 : ((First > Second) ? 1 : 0));
+                            }
+                        }
+                        break;
+                    case 'User':
+                        {
+                            if (b.data[0].UniqeUser != null && b.data[0].UniqeUser != undefined && a.data[0].UniqeUser != null && a.data[0].UniqeUser != undefined) {
+                                var First = a.data[0].UniqeUser;
+                                var Second = b.data[0].UniqeUser;
+                                return ((First < Second) ? -1 : ((First > Second) ? 1 : 0));
+                            }
+                        }
+                        break;
+                }
+            }
+        }
+    </script>
+</head>
+<body style="background-image: url('/jGlzr.png');">
+    <div>
+        <div id="dataTable"></div>
+    </div>
+</body>
+</html>
